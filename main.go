@@ -29,7 +29,7 @@ type Results struct {
 	Id int `json:"id"`
 	Name string `json:"name"`
 	Desc string `json:"description"`
-	Comics []Comics `json:"comics"`
+	Comics Comics `json:"comics"`
 }
 
 type Comics struct {
@@ -37,26 +37,35 @@ type Comics struct {
 	Items []Items `json:"items"`
 }
 
+//De forma similar se puede agregar mas informacion
+//sobre series, eventos, etc
+//Pero tanta informacion no seria comodo de leer
+//para el usuario final
+
 type Items struct {
 	ResourceURI 	string	`json:"resourceURI"`
 	Name 	string		`json:"name"`
 }
 
-type ComicResponse struct {
-	Data Data `json:"data"`
-}
+//type ComicResponse struct {
+//	Data Data `json:"data"`
+//}
+//
+//type ComicData struct {
+//	Results []ComicResults `json:"results"`
+//	Count 	int		  `json:"count"`
+//}
+//
+//type ComicResults struct {
+//	Id int `json:"id"`
+//	DigitalId int `json:"digitalId"`
+//	Title string `json:"title"`
+//	Desc string `json:"description"`
+//	Mod 	string	`json:"modified"`
+//	DiamondCode	string	`json:"diamondCode"`
+//	PageCount	int		`json:"pageCount"`
+//}
 
-type ComicData struct {
-	Results []Results `json:"results"`
-	Count 	int		  `json:"count"`
-}
-
-type ComicResults struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	Desc string `json:"description"`
-	Comics []Comics `json:"comics"`
-}
 
 
 
@@ -90,6 +99,50 @@ func main() {
 	}
 	switch opt {
 	case 1:
+		URL := "http://gateway.marvel.com/v1/public/characters?limit=20&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
+		response, err := http.Get(URL)
+		//fmt.Println(URL)
+		if err != nil {
+			fmt.Print(err.Error())
+			os.Exit(1)
+		}
+		defer response.Body.Close()
+		responseData, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		responseObject := Response{}
+		json.Unmarshal(responseData, &responseObject)
+
+		for i:=0;i< responseObject.Data.Count ;i++  {
+			fmt.Print("Resultado Nº ",(i+1),"\n")
+			fmt.Println("ID:")
+			fmt.Println(responseObject.Data.Results[i].Id)
+			fmt.Println("Nombre:")
+			fmt.Println(responseObject.Data.Results[i].Name)
+			fmt.Println("Descripción:")
+			if responseObject.Data.Results[i].Desc == "" {
+				fmt.Println("No hay información disponible")
+			}else {
+				fmt.Println(responseObject.Data.Results[i].Desc)
+			}
+			fmt.Println("Comics donde apareció:\n")
+			if responseObject.Data.Results[i].Comics.Available == 0{
+				fmt.Println("No se encontraron registros")
+			}
+
+			for j:=0;j < responseObject.Data.Results[i].Comics.Available && j<20 ;j++  {
+				fmt.Println("Comic N: ",j+1)
+				URIComic:=string(responseObject.Data.Results[i].Comics.Items[j].ResourceURI)+"?ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
+				fmt.Println("Nombre:")
+				fmt.Println(responseObject.Data.Results[i].Comics.Items[j].Name)
+				fmt.Println("URL con mas información:")
+				fmt.Println(URIComic)
+				fmt.Println("-----------------------------------")
+			}
+			fmt.Println("-------------------------------------")
+		}
 		break
 	case 2:
 		URL := "http://gateway.marvel.com/v1/public/characters?limit=20&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
@@ -119,6 +172,20 @@ func main() {
 				fmt.Println("No hay información disponible")
 			}else {
 				fmt.Println(responseObject.Data.Results[i].Desc)
+			}
+			fmt.Println("Comics donde apareció:\n")
+			if responseObject.Data.Results[i].Comics.Available == 0{
+				fmt.Println("No se encontraron registros")
+			}
+
+			for j:=0;j < responseObject.Data.Results[i].Comics.Available && j<20 ;j++  {
+				fmt.Println("Comic N: ",j+1)
+				URIComic:=string(responseObject.Data.Results[i].Comics.Items[j].ResourceURI)+"?ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
+				fmt.Println("Nombre:")
+				fmt.Println(responseObject.Data.Results[i].Comics.Items[j].Name)
+				fmt.Println("URL con mas información:")
+				fmt.Println(URIComic)
+				fmt.Println("-----------------------------------")
 			}
 			fmt.Println("-------------------------------------")
 		}
