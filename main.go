@@ -87,9 +87,9 @@ func main() {
 	fmt.Printf("----------------------------------------------------\n")
 
 
-	fmt.Printf("Bienvenido al servicio de consulta de superheroes\n")
+	fmt.Printf("Bienvenido al servicio de consulta de superhéroes\n")
 	fmt.Printf("Elija una opción\n")
-	fmt.Printf("1. Buscar superheroe por nombre\n")
+	fmt.Printf("1. Buscar superhéroe por nombre\n")
 	fmt.Printf("2. Listar los últimos 20 registros\n")
 
 	var opt int
@@ -99,7 +99,13 @@ func main() {
 	}
 	switch opt {
 	case 1:
-		URL := "http://gateway.marvel.com/v1/public/characters?limit=20&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
+		fmt.Println("Ingrese el nombre del superhéroe que desea buscar:")
+		var name string
+		_,err := fmt.Scan(&name)
+		if err != nil {
+			fmt.Print(err.Error())
+		}
+		URL := "http://gateway.marvel.com/v1/public/characters?limit=100&name="+ name +"&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
 		response, err := http.Get(URL)
 		//fmt.Println(URL)
 		if err != nil {
@@ -114,6 +120,11 @@ func main() {
 
 		responseObject := Response{}
 		json.Unmarshal(responseData, &responseObject)
+
+		if responseObject.Data.Count == 0 {
+			fmt.Println("Lo sentimos, no se encontró ningún superhéroe registrado con ese nombre")
+			os.Exit(0)
+		}
 
 		for i:=0;i< responseObject.Data.Count ;i++  {
 			fmt.Print("Resultado Nº ",(i+1),"\n")
@@ -137,15 +148,16 @@ func main() {
 				URIComic:=string(responseObject.Data.Results[i].Comics.Items[j].ResourceURI)+"?ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
 				fmt.Println("Nombre:")
 				fmt.Println(responseObject.Data.Results[i].Comics.Items[j].Name)
-				fmt.Println("URL con mas información:")
+				fmt.Println("URL con más información:")
 				fmt.Println(URIComic)
 				fmt.Println("-----------------------------------")
 			}
 			fmt.Println("-------------------------------------")
 		}
+		fmt.Println("**Gracias por usar este servicio.**")
 		break
 	case 2:
-		URL := "http://gateway.marvel.com/v1/public/characters?limit=20&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
+		URL := "http://gateway.marvel.com/v1/public/characters?limit=20&orderBy=name&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
 		response, err := http.Get(URL)
 		//fmt.Println(URL)
 		if err != nil {
@@ -162,7 +174,7 @@ func main() {
 		json.Unmarshal(responseData, &responseObject)
 
 		for i:=0;i< responseObject.Data.Count ;i++  {
-			fmt.Print("Resultado Nº ",(i+1),"\n")
+			fmt.Print("Heroe Nº ",(i+1),"\n")
 			fmt.Println("ID:")
 			fmt.Println(responseObject.Data.Results[i].Id)
 			fmt.Println("Nombre:")
@@ -189,6 +201,7 @@ func main() {
 			}
 			fmt.Println("-------------------------------------")
 		}
+		fmt.Println("**Gracias por usar este servicio.**")
 		break
 	}
 
