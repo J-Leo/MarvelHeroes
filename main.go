@@ -144,6 +144,10 @@ func main() {
 			fmt.Println("-------------------------------------")
 		}
 		fmt.Println("**Gracias por usar este servicio.**")
+		/*Pausa forzada del ejecutable*/
+		for{
+			time.Sleep(time.Second)
+		}
 		break
 	case 2:
 		URL := "http://gateway.marvel.com/v1/public/characters?limit=20&orderBy=name&ts="+ ts +"&apikey="+ publicKey +"&hash=" + myHash
@@ -197,6 +201,10 @@ func main() {
 			fmt.Println("-------------------------------------")
 		}
 		fmt.Println("**Gracias por usar este servicio.**")
+		/*Pausa forzada del ejecutable*/
+		for {
+			time.Sleep(time.Second)
+		}
 		break
 	}
 
