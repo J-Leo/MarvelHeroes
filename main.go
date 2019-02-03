@@ -124,9 +124,11 @@ func main() {
 
 		var err error
 
-		str :=  string([]byte(input)[0])
+		str :=  string([]byte(input)[0])	//Solo se leera el primer numero
 		opt,err = strconv.Atoi(str)
-
+		/*Si al convertir el primer caracter a entero hay un error
+		// se maneja a continuacion
+		*/
 		if err != nil  {
 
 			fmt.Println("Error, opción no válida.")
